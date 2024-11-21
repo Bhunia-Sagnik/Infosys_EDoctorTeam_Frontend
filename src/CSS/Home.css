@@ -3,27 +3,31 @@
     margin: 0;
     font-family: 'Arial', sans-serif;
     background-image: url('../../public/images/bg1.jpg');
-    background-size: cover; /* Ensures the image covers the entire viewport */
-    background-position: center; /* Centers the image */
-    background-repeat: no-repeat; /* Prevents the image from repeating */
-    background-attachment: fixed; /* Keeps the image in place while scrolling */
-    height: 100vh; /* Ensures the body covers the entire viewport */
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat; 
+    background-attachment:fixed; 
+    height: 100vh; 
+    padding: 2rem;
   }
   
   
   /* Hero Section */
   .hero-section {
+    height: 20rem;
+    width: 40rem;
+    margin: auto;
     background-image: url('../../public/images/bg2.jpg');
     background-size: cover;
     background-position: center;
     padding: 80px 20px;
-    color: #356c8c;
+    color: black;
     font-style: oblique;
-    text-decoration: underline;
     font-weight: bold;
     text-align: center;
-    border: 2px solid black;
-    border-radius: 2rem;
+    border: 0px solid black;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px 2px #356c8c;
   }
   
   .hero-content {
@@ -34,6 +38,7 @@
   .hero-content h1 {
     font-size: 3rem;
     margin-bottom: 20px;
+    text-decoration: underline;
   }
   
   .hero-content p {
@@ -45,6 +50,7 @@
     display: flex;
     justify-content: center;
     gap: 15px;
+    font-style: normal;
   }
   
   .btn {
@@ -79,16 +85,20 @@
   
   /* Features Section */
   .features-section {
-    padding: 40px 20px;
+    height: 15rem;
+    width: 80rem;
+    margin: auto;
+    margin-top: 2rem;
+    padding: 20px 20px;
     text-align: center;
-    background-color: #5e949c;
+    background-color: #3c9fc4;
     border: 0px solid black;
-    border-radius: 2rem;
+    border-radius: 5px;
   }
   
   .features-section h2 {
     font-size: 2.2rem;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
     color: whitesmoke;
   }
   

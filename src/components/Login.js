@@ -25,36 +25,39 @@ function Login() {
   };
 
   return (
-    <div className="login-container">
-      <h1>Login</h1>
-      <form onSubmit={handleLogin}>
-        <div className="form-group">
-          <label>Username:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username"
-            required
-          />
+    <body>
+      <div className="login-container">
+        <h1>Login</h1>
+        <form onSubmit={handleLogin}>
+          <div className="form-group">
+            <label>Username:</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Password:</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+          <button className="btn-primary" type="submit">Login</button>
+        </form>
+        <div className="login-footer">
+          <Link to="/forgot-password" className="forgot-password-link">Forgot Password?</Link>
+          <Link to="/register" className="register-link">Don't have an account?</Link>
         </div>
-        <div className="form-group">
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-            required
-          />
-        </div>
-        <button className="btn-primary" type="submit">Login</button>
-      </form>
-      <div className="login-footer">
-        <Link to="/forgot-password" className="forgot-password-link">Forgot Password?</Link>
+        {message && <p className="message">{message}</p>}
       </div>
-      {message && <p className="message">{message}</p>}
-    </div>
+    </body>
     
   );
 }

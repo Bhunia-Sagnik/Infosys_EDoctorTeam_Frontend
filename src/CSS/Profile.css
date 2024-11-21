@@ -1,0 +1,10 @@
+.profile-container {
+    margin: 0;
+    background-image: url('../../public/images/coming-soon.jpg');
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat; 
+    background-attachment: fixed; 
+    height: 100vh;
+    padding: 5rem;
+}

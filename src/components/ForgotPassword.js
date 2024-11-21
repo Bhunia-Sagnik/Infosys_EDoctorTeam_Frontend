@@ -23,7 +23,7 @@ function ForgotPassword() {
   };
 
   return (
-    <div >
+    <div className='forgot-password-container'>
       <h1>Forgot Password</h1>
       <form onSubmit={handleForgotPassword}>
         <div className="form-group">
