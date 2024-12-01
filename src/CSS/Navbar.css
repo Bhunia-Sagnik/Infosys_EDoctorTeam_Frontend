@@ -1,0 +1,25 @@
+.navbar{
+  background-color: rgba(255, 255, 255, 0.9); /* Light background for readability */
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2); /* Adding shadow */
+  border-radius: 10px;
+}
+
+/* Navbar styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1px 1px;
+  color: #fff;
+  background-color: rgba(6, 6, 44, 0.8);
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+h2{
+  color: #fff;
+}

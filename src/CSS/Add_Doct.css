@@ -1,0 +1,99 @@
+/* Styling for the create doctor form */
+/* Create Doctor Form Styling */
+.create-doctor-form {
+  width: 70%; /* Reduced form width for a more compact look */
+  margin: 30px auto;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeInSlide 1s ease; /* Animation */
+  color: #333;
+  max-width: 800px; /* Max width for larger screens */
+}
+
+.create-doctor-form h2 {
+  text-align: center;
+  color: #198754; /* Hospital green */
+  font-size: 2rem; /* Increased font size for header */
+  margin-bottom: 20px;
+  font-weight: 600; /* Bold header text */
+}
+
+/* Input Styling */
+.create-doctor-form input {
+  width: 100%;
+  padding: 12px; /* Slightly increased padding for more space */
+  margin: 15px 0;
+  border: 1px solid #ddd;
+  border-radius: 6px; /* Slightly rounded corners */
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border 0.3s, box-shadow 0.3s; /* Added box-shadow transition */
+}
+
+.create-doctor-form input:focus {
+  border-color: #0dcaf0; /* Teal focus */
+  outline: none;
+  box-shadow: 0 0 5px rgba(13, 202, 240, 0.5); /* Focused shadow effect */
+}
+
+/* Submit Button Styling */
+.submit-btn {
+  background-color: #198754; /* Hospital green */
+  color: #ffffff;
+  padding: 12px 24px; /* Increased padding for better button size */
+  border: none;
+  cursor: pointer;
+  border-radius: 6px; /* Rounded corners */
+  display: block;
+  margin: 20px auto;
+  font-size: 1.2rem; /* Larger font size for better readability */
+  transition: background-color 0.3s, transform 0.2s ease-in-out; /* Button hover effect */
+}
+
+.submit-btn:hover {
+  background-color: #157347; /* Darker green */
+  transform: translateY(-2px); /* Slight upward shift on hover */
+}
+
+/* Animation */
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Error message styling */
+.error-message {
+  color: red;
+  font-size: 0.9em;
+  margin-top: -8px;
+  margin-bottom: 10px;
+  font-style: italic; /* Italicize error message */
+}
+
+/* Responsive Adjustments for Mobile */
+@media (max-width: 768px) {
+  .create-doctor-form {
+    width: 90%; /* Increased form width on smaller screens */
+    padding: 20px;
+  }
+
+  .create-doctor-form h2 {
+    font-size: 1.5rem; /* Adjust header font size for smaller screens */
+  }
+
+  .submit-btn {
+    font-size: 1rem; /* Adjust button font size for smaller screens */
+    padding: 10px 20px; /* Adjust padding for smaller screens */
+  }
+
+  .create-doctor-form input {
+    padding: 10px; /* Adjust padding for smaller screens */
+  }
+}

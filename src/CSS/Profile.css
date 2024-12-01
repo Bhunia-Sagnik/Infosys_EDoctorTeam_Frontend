@@ -1,0 +1,159 @@
+h2{
+  color: #fff;
+}
+
+
+/* Background and container styling */
+
+.doctor-list-container {
+  background-image: url('https://t3.ftcdn.net/jpg/02/38/08/42/360_F_238084232_5XhGUddDZezzJxybvVXzfPp8cOKAuqRp.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: #333;
+  font-family: Arial, sans-serif;
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.6); /* Dark overlay */
+  backdrop-filter: blur(10px); /* Blur background */
+}
+
+/* Adjusting content to be bright */
+.content, .navbar, .create-doctor-form {
+  background-color: rgba(255, 255, 255, 0.9); /* Light background for readability */
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2); /* Adding shadow */
+  border-radius: 10px;
+}
+
+/* Navbar styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1px 1px;
+  color: #fff;
+  background-color: rgba(6, 6, 44, 0.8);
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+.logout-btn {
+  background-color: red;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  margin: 20px 0;
+  color: #111;
+}
+.add-doctor-btn {
+  margin-top: 10px;
+  margin-left: 15px;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  background-color: #2f8b32;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  animation: fadeIn 1.5s ease-in-out;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.add-doctor-btn:hover {
+  background-color: #249125;
+  transform: scale(1.1);
+}
+
+.add-doctor-btn:active {
+  background-color: #1e6e1d;
+  transform: scale(1.05);
+}
+
+.success-message {
+  color: green;
+  text-align: center;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+/* Table styling */
+.doctor-table {
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.doctor-table th,
+.doctor-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.doctor-table th {
+  background-color: #007bff;
+  color: white;
+}
+
+.doctor-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Footer styling - always at the bottom and compact size */
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #f5f5f5;
+  text-align: center;
+  padding: 5px;
+  font-size: 10px;
+  color: #666;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure main content does not overlap the footer */
+.content {
+  padding-bottom: 50px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.doctor-list-container, .navbar, .content, .footer {
+  animation: fadeIn 1.5s ease;
+}
