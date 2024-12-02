@@ -9,6 +9,7 @@ import ResetPassword from './components/ResetPassword';
 import Profile from './components/Profile';
 import Navbar from './components/Navbar';
 import AppointmentList from './components/AppointmentList';
+import AvailabledatesList from './components/AvailabledatesList';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/navbar" element={<Navbar/>} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/AppointmentList" element={<AppointmentList />} />
+        <Route path="/AvailabledatesList" element={<AvailabledatesList/>}/>
       </Routes>
     </Router>
   );

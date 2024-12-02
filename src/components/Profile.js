@@ -112,7 +112,7 @@ const Profile = () => {
         <h2>Doctor App</h2>
         <div className="nav-links">
           <Link to="/Profile">Profile</Link>
-          <Link to="/Availability">Availability</Link>
+          <Link to="/AvailabledatesList">Availability</Link>
           <Link to="/AppointmentList">Appointment List</Link>
           <Link to="/Feedbacks">Feedbacks</Link>
           <Link to="/Actions">Actions</Link>
