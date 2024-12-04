@@ -6,18 +6,17 @@ import '../CSS/Add_Doct.css';
 const Profile = () => {
   const [doctors, setDoctors] = useState([]);
   const [showForm, setShowForm] = useState(false);
-
   const [formData, setFormData] = useState({
-    username: '',
-    speciality: '',
+    name: '',
+    specialization: '',
     location: '',
-    hospital: '',
-    mobile: '',
-    profilePhoto: null,
+    hospitalName: '',
+    mobileNo: '',
+    email: '',
+    password: '',
+    chargedPerVisit: 0,
   });
-
   const [errors, setErrors] = useState({});
-  const maxPhotoSize = 2 * 1024 * 1024; // 2MB limit for photo
 
   const handleAddDoctorClick = () => {
     setShowForm(!showForm);
@@ -29,79 +28,68 @@ const Profile = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const fileSizeValid = file.size <= maxPhotoSize;
-      const fileTypeValid = file.type.startsWith("image/");
-      const validFace = file.name.toLowerCase().includes("face");
-
-      if (!fileSizeValid) {
-        setErrors((prev) => ({ ...prev, profilePhoto: 'Photo size must not exceed 2MB' }));
-      } else if (!fileTypeValid) {
-        setErrors((prev) => ({ ...prev, profilePhoto: 'Invalid photo format. Only images are allowed.' }));
-      } else if (!validFace) {
-        setErrors((prev) => ({ ...prev, profilePhoto: 'Photo must clearly show the face.' }));
-      } else {
-        setErrors((prev) => ({ ...prev, profilePhoto: '' }));
-        setFormData({ ...formData, profilePhoto: file });
-      }
-    }
-  };
-
   const validateForm = () => {
     const newErrors = {};
-    const usernamePattern = /^(?=.*[A-Z])[A-Za-z0-9]{3,}$/;
     const mobilePattern = /^[0-9]{10}$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!usernamePattern.test(formData.username)) {
-      newErrors.username = 'Username must be alphanumeric and contain at least one uppercase letter.';
+    if (!formData.name.trim()) newErrors.name = 'Name is mandatory';
+    if (!formData.location.trim()) newErrors.location = 'Location is mandatory';
+    if (!formData.mobileNo || !mobilePattern.test(formData.mobileNo)) {
+      newErrors.mobileNo = 'Mobile number must be exactly 10 digits';
     }
-    if (formData.speciality.trim() === '') {
-      newErrors.speciality = 'Speciality is required';
+    if (!formData.email || !emailPattern.test(formData.email)) {
+      newErrors.email = 'Invalid email address';
     }
-    if (formData.location.trim() === '') {
-      newErrors.location = 'Location is required';
+    if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters long';
     }
-    if (formData.hospital.trim() === '') {
-      newErrors.hospital = 'Hospital name is required';
-    }
-    if (!mobilePattern.test(formData.mobile)) {
-      newErrors.mobile = 'Mobile number must be exactly 10 digits.';
-    }
-    if (!formData.profilePhoto) {
-      newErrors.profilePhoto = 'Profile photo is required.';
+    if (!formData.chargedPerVisit || formData.chargedPerVisit <= 0) {
+      newErrors.chargedPerVisit = 'Charged Per Visit must be a positive number';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const doctorId = `DOC${Date.now()}`;
+    try {
+      const response = await fetch('http://localhost:8080/doctors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    const doctorData = {
-      ...formData,
-      id: doctorId,
-    };
-
-    alert('Doctor Profile Created! ID sent to the registered email.');
-    setDoctors([...doctors, doctorData]);
-    setShowForm(false);
-    resetForm();
+      if (response.ok) {
+        const newDoctor = await response.json();
+        alert('Doctor Profile Created Successfully!');
+        setDoctors([...doctors, newDoctor]);
+        setShowForm(false);
+        resetForm();
+      } else {
+        const errorData = await response.json();
+        setErrors((prev) => ({ ...prev, server: errorData.message || 'Failed to create doctor profile' }));
+      }
+    } catch (error) {
+      setErrors((prev) => ({ ...prev, server: 'Failed to connect to the server. Please try again.' }));
+    }
   };
 
   const resetForm = () => {
     setFormData({
-      username: '',
-      speciality: '',
+      name: '',
+      specialization: '',
       location: '',
-      hospital: '',
-      mobile: '',
-      profilePhoto: null,
+      hospitalName: '',
+      mobileNo: '',
+      email: '',
+      password: '',
+      chargedPerVisit: 0,
     });
     setErrors({});
   };
@@ -132,19 +120,25 @@ const Profile = () => {
             <tr>
               <th>Doctor ID</th>
               <th>Doctor Name</th>
-              <th>Speciality</th>
+              <th>Specialization</th>
               <th>Location</th>
               <th>Hospital Name</th>
+              <th>Email</th>
+              <th>Mobile No</th>
+              <th>Charged Per Visit</th>
             </tr>
           </thead>
           <tbody>
             {doctors.map((doctor, index) => (
               <tr key={index}>
-                <td>{doctor.id}</td>
-                <td>{doctor.username}</td>
-                <td>{doctor.speciality}</td>
+                <td>{doctor.doctorId}</td>
+                <td>{doctor.name}</td>
+                <td>{doctor.specialization}</td>
                 <td>{doctor.location}</td>
-                <td>{doctor.hospital}</td>
+                <td>{doctor.hospitalName}</td>
+                <td>{doctor.email}</td>
+                <td>{doctor.mobileNo}</td>
+                <td>{doctor.chargedPerVisit}</td>
               </tr>
             ))}
           </tbody>
@@ -155,64 +149,43 @@ const Profile = () => {
         <div className="create-doctor-form animated-form">
           <h2>Create Doctor</h2>
           <form onSubmit={handleSubmit}>
-            <label>Username</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-            />
-            {errors.username && <p className="error-message">{errors.username}</p>}
+            <label>Name</label>
+            <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+            {errors.name && <p className="error-message">{errors.name}</p>}
 
-            <label>Speciality</label>
-            <input
-              type="text"
-              name="speciality"
-              value={formData.speciality}
-              onChange={handleChange}
-              required
-            />
-            {errors.speciality && <p className="error-message">{errors.speciality}</p>}
+            <label>Specialization</label>
+            <input type="text" name="specialization" value={formData.specialization} onChange={handleChange} />
 
             <label>Location</label>
-            <input
-              type="text"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              required
-            />
+            <input type="text" name="location" value={formData.location} onChange={handleChange} required />
             {errors.location && <p className="error-message">{errors.location}</p>}
 
             <label>Hospital Name</label>
-            <input
-              type="text"
-              name="hospital"
-              value={formData.hospital}
-              onChange={handleChange}
-              required
-            />
-            {errors.hospital && <p className="error-message">{errors.hospital}</p>}
+            <input type="text" name="hospitalName" value={formData.hospitalName} onChange={handleChange} />
 
             <label>Mobile No</label>
+            <input type="text" name="mobileNo" value={formData.mobileNo} onChange={handleChange} required />
+            {errors.mobileNo && <p className="error-message">{errors.mobileNo}</p>}
+
+            <label>Email</label>
+            <input type="email" name="email" value={formData.email} onChange={handleChange} required />
+            {errors.email && <p className="error-message">{errors.email}</p>}
+
+            <label>Password</label>
+            <input type="password" name="password" value={formData.password} onChange={handleChange} required />
+            {errors.password && <p className="error-message">{errors.password}</p>}
+
+            <label>Charged Per Visit</label>
             <input
-              type="text"
-              name="mobile"
-              value={formData.mobile}
+              type="number"
+              name="chargedPerVisit"
+              value={formData.chargedPerVisit}
               onChange={handleChange}
               required
             />
-            {errors.mobile && <p className="error-message">{errors.mobile}</p>}
+            {errors.chargedPerVisit && <p className="error-message">{errors.chargedPerVisit}</p>}
 
-            <label>Profile Photo (Max 2MB, Face Picture)</label>
-            <input
-              type="file"
-              name="profilePhoto"
-              onChange={handlePhotoChange}
-              accept="image/*"
-            />
-            {errors.profilePhoto && <p className="error-message">{errors.profilePhoto}</p>}
+            {errors.server && <p className="error-message">{errors.server}</p>}
 
             <button type="submit" className="submit-btn">Submit</button>
           </form>

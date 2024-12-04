@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';  // Import axios for API requests
 import '../CSS/Availabledates.css';
 import '../CSS/Add_Availability.css';
-
 
 const AvailabledatesList = () => {
   const [availableDates, setAvailableDates] = useState([]);
@@ -15,6 +15,19 @@ const AvailabledatesList = () => {
   });
 
   const [errors, setErrors] = useState({});
+
+  const API_URL = 'http://localhost:8080/api/availability'; // Your backend API URL
+
+  // Fetch available dates from the backend
+  useEffect(() => {
+    axios.get(API_URL)
+      .then(response => {
+        setAvailableDates(response.data);  // Set the available dates from backend
+      })
+      .catch(error => {
+        console.error("There was an error fetching the available dates!", error);
+      });
+  }, []);
 
   // Toggle form visibility
   const handleAddAvailabilityClick = () => {
@@ -50,16 +63,23 @@ const AvailabledatesList = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const availableDateID = `AD${Date.now()}`; // Auto-generate Available Date ID
-    const availableDateData = {
-      availableDateID,
-      ...formData,
+    const availabilityData = {
+      doctorId: formData.doctorID,
+      fromDate: formData.fromDate,
+      endDate: formData.endDate,
     };
 
-    alert('Availability Added Successfully!');
-    setAvailableDates([...availableDates, availableDateData]);
-    setShowForm(false);
-    resetForm();
+    // Send POST request to backend to add availability
+    axios.post(API_URL, availabilityData)
+      .then(response => {
+        alert('Availability Added Successfully!');
+        setAvailableDates([...availableDates, response.data]); // Add the new availability to the state
+        setShowForm(false);
+        resetForm();
+      })
+      .catch(error => {
+        console.error("There was an error adding the availability!", error);
+      });
   };
 
   // Reset form fields
@@ -107,9 +127,9 @@ const AvailabledatesList = () => {
           </thead>
           <tbody>
             {availableDates.map((date, index) => (
-              <tr key={index}>
-                <td>{date.availableDateID}</td>
-                <td>{date.doctorID}</td>
+              <tr key={date.availabilityId}>
+                <td>{date.availabilityId}</td>
+                <td>{date.doctorId}</td>
                 <td>{date.fromDate}</td>
                 <td>{date.endDate}</td>
               </tr>

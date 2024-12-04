@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../CSS/AppointmentList.css';
 import '../CSS/Add_Appoin.css';
@@ -10,13 +10,20 @@ const AppointmentList = () => {
   const [formData, setFormData] = useState({
     patientID: '',
     doctorID: '',
-    date: '',
-    time: '',
-    status: 'Waiting',
-    remarks: '',
+    appointmentDateTime: '',
+    reason: '',
+    status: 'Pending',
   });
 
   const [errors, setErrors] = useState({});
+
+  // Fetch existing appointments
+  useEffect(() => {
+    fetch('/api/appointments') // Replace with actual backend API endpoint
+      .then((response) => response.json())
+      .then((data) => setAppointments(data))
+      .catch((error) => console.error('Error fetching appointments:', error));
+  }, []);
 
   // Toggle form visibility
   const handleAddAppointmentClick = () => {
@@ -39,11 +46,11 @@ const AppointmentList = () => {
     if (formData.doctorID.trim() === '') {
       newErrors.doctorID = 'Doctor ID is required';
     }
-    if (formData.date.trim() === '') {
-      newErrors.date = 'Date is required';
+    if (formData.appointmentDateTime.trim() === '') {
+      newErrors.appointmentDateTime = 'Appointment date and time is required';
     }
-    if (formData.time.trim() === '') {
-      newErrors.time = 'Time is required';
+    if (formData.reason.trim() === '') {
+      newErrors.reason = 'Reason is required';
     }
 
     setErrors(newErrors);
@@ -55,16 +62,36 @@ const AppointmentList = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const appointmentID = `APT${Date.now()}`; // Auto-generate Appointment ID
     const appointmentData = {
-      ...formData,
-      appointmentID,
+      doctor: { doctorId: formData.doctorID }, // Backend expects nested object
+      patient: { patientId: formData.patientID }, // Backend expects nested object
+      appointmentDateTime: formData.appointmentDateTime,
+      reason: formData.reason,
+      status: formData.status,
     };
 
-    alert('Appointment Scheduled Successfully!');
-    setAppointments([...appointments, appointmentData]);
-    setShowForm(false);
-    resetForm();
+    // POST API call to save appointment
+    fetch('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(appointmentData),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to schedule appointment');
+        }
+        return response.json();
+      })
+      .then((newAppointment) => {
+        setAppointments([...appointments, newAppointment]);
+        alert('Appointment Scheduled Successfully!');
+        setShowForm(false);
+        resetForm();
+      })
+      .catch((error) => {
+        console.error('Error scheduling appointment:', error);
+        alert('Failed to schedule appointment. Please try again.');
+      });
   };
 
   // Reset form fields
@@ -72,17 +99,15 @@ const AppointmentList = () => {
     setFormData({
       patientID: '',
       doctorID: '',
-      date: '',
-      time: '',
-      status: 'Waiting',
-      remarks: '',
+      appointmentDateTime: '',
+      reason: '',
+      status: 'Pending',
     });
     setErrors({});
   };
 
   return (
     <div className="appointment-list-container animated-page">
-      {/* Updated Navbar to match Navbar.js */}
       <div className="navbar animated-navbar">
         <h2>Doctor App</h2>
         <div className="nav-links">
@@ -111,22 +136,27 @@ const AppointmentList = () => {
               <th>Appointment ID</th>
               <th>Patient ID</th>
               <th>Doctor ID</th>
-              <th>Date</th>
-              <th>Time</th>
+              <th>Date & Time</th>
+              <th>Reason</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
             {appointments.map((appointment, index) => (
               <tr key={index}>
-                <td>{appointment.appointmentID}</td>
-                <td>{appointment.patientID}</td>
-                <td>{appointment.doctorID}</td>
-                <td>{appointment.date}</td>
-                <td>{appointment.time}</td>
+                <td>{appointment.appointmentId}</td>
+                <td>{appointment.patient.patientId}</td>
+                <td>{appointment.doctor.doctorId}</td>
+                <td>{appointment.appointmentDateTime}</td>
+                <td>{appointment.reason}</td>
                 <td
                   style={{
-                    color: appointment.status === 'Approved' ? 'green' : 'red',
+                    color:
+                      appointment.status === 'Confirmed'
+                        ? 'green'
+                        : appointment.status === 'Cancelled'
+                        ? 'red'
+                        : 'orange',
                   }}
                 >
                   {appointment.status}
@@ -161,25 +191,26 @@ const AppointmentList = () => {
             />
             {errors.doctorID && <p className="error-message">{errors.doctorID}</p>}
 
-            <label>Date</label>
+            <label>Date & Time</label>
             <input
-              type="date"
-              name="date"
-              value={formData.date}
+              type="datetime-local"
+              name="appointmentDateTime"
+              value={formData.appointmentDateTime}
               onChange={handleChange}
               required
             />
-            {errors.date && <p className="error-message">{errors.date}</p>}
+            {errors.appointmentDateTime && (
+              <p className="error-message">{errors.appointmentDateTime}</p>
+            )}
 
-            <label>Time</label>
-            <input
-              type="time"
-              name="time"
-              value={formData.time}
+            <label>Reason</label>
+            <textarea
+              name="reason"
+              value={formData.reason}
               onChange={handleChange}
               required
             />
-            {errors.time && <p className="error-message">{errors.time}</p>}
+            {errors.reason && <p className="error-message">{errors.reason}</p>}
 
             <label>Status</label>
             <select
@@ -187,20 +218,10 @@ const AppointmentList = () => {
               value={formData.status}
               onChange={handleChange}
             >
-              <option value="Approved" style={{ color: 'green' }}>
-                Approved
-              </option>
-              <option value="Waiting" style={{ color: 'red' }}>
-                Waiting
-              </option>
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Cancelled">Cancelled</option>
             </select>
-
-            <label>Remarks</label>
-            <textarea
-              name="remarks"
-              value={formData.remarks}
-              onChange={handleChange}
-            />
 
             <button type="submit" className="submit-btn">
               Submit
