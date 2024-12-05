@@ -1,64 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';  // Import axios for API requests
-import '../CSS/Availabledates.css';
-import '../CSS/Add_Availability.css';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import "../CSS/Availabledates.css";
+import "../CSS/Add_Availability.css";
 
 const AvailabledatesList = () => {
   const [availableDates, setAvailableDates] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null); // Track editing state
 
   const [formData, setFormData] = useState({
-    doctorID: '',
-    fromDate: '',
-    endDate: '',
+    doctorID: "",
+    fromDate: "",
+    endDate: "",
   });
 
   const [errors, setErrors] = useState({});
+  const API_URL = "http://localhost:8080/api/availability";
 
-  const API_URL = 'http://localhost:8080/api/availability'; // Your backend API URL
-
-  // Fetch available dates from the backend
   useEffect(() => {
-    axios.get(API_URL)
-      .then(response => {
-        setAvailableDates(response.data);  // Set the available dates from backend
+    axios
+      .get(API_URL)
+      .then((response) => {
+        setAvailableDates(response.data);
       })
-      .catch(error => {
-        console.error("There was an error fetching the available dates!", error);
+      .catch((error) => {
+        console.error("Error fetching available dates!", error);
       });
   }, []);
 
-  // Toggle form visibility
   const handleAddAvailabilityClick = () => {
     setShowForm(!showForm);
     resetForm();
+    setEditingId(null); // Clear editing state
   };
 
-  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Validate form fields
   const validateForm = () => {
     const newErrors = {};
-    if (formData.doctorID.trim() === '') {
-      newErrors.doctorID = 'Doctor ID is required';
-    }
-    if (formData.fromDate.trim() === '') {
-      newErrors.fromDate = 'From Date is required';
-    }
-    if (formData.endDate.trim() === '') {
-      newErrors.endDate = 'End Date is required';
-    }
+    if (formData.doctorID.trim() === "") newErrors.doctorID = "Doctor ID is required";
+    if (formData.fromDate.trim() === "") newErrors.fromDate = "From Date is required";
+    if (formData.endDate.trim() === "") newErrors.endDate = "End Date is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -69,27 +60,68 @@ const AvailabledatesList = () => {
       endDate: formData.endDate,
     };
 
-    // Send POST request to backend to add availability
-    axios.post(API_URL, availabilityData)
-      .then(response => {
-        alert('Availability Added Successfully!');
-        setAvailableDates([...availableDates, response.data]); // Add the new availability to the state
-        setShowForm(false);
-        resetForm();
-      })
-      .catch(error => {
-        console.error("There was an error adding the availability!", error);
-      });
+    if (editingId) {
+      // Update existing entry
+      axios
+        .put(`${API_URL}/${editingId}`, availabilityData)
+        .then((response) => {
+          alert("Availability Updated Successfully!");
+          setAvailableDates((prevDates) =>
+            prevDates.map((date) =>
+              date.availabilityId === editingId ? response.data : date
+            )
+          );
+          setShowForm(false);
+          resetForm();
+        })
+        .catch((error) => console.error("Error updating availability!", error));
+    } else {
+      // Add new entry
+      axios
+        .post(API_URL, availabilityData)
+        .then((response) => {
+          alert("Availability Added Successfully!");
+          setAvailableDates([...availableDates, response.data]);
+          setShowForm(false);
+          resetForm();
+        })
+        .catch((error) => console.error("Error adding availability!", error));
+    }
   };
 
-  // Reset form fields
+  const handleEdit = (id) => {
+    const dateToEdit = availableDates.find((date) => date.availabilityId === id);
+    setFormData({
+      doctorID: dateToEdit.doctorId,
+      fromDate: dateToEdit.fromDate,
+      endDate: dateToEdit.endDate,
+    });
+    setEditingId(id);
+    setShowForm(true);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this availability?")) {
+      axios
+        .delete(`${API_URL}/${id}`)
+        .then(() => {
+          alert("Availability Deleted Successfully!");
+          setAvailableDates((prevDates) =>
+            prevDates.filter((date) => date.availabilityId !== id)
+          );
+        })
+        .catch((error) => console.error("Error deleting availability!", error));
+    }
+  };
+
   const resetForm = () => {
     setFormData({
-      doctorID: '',
-      fromDate: '',
-      endDate: '',
+      doctorID: "",
+      fromDate: "",
+      endDate: "",
     });
     setErrors({});
+    setEditingId(null);
   };
 
   return (
@@ -101,7 +133,6 @@ const AvailabledatesList = () => {
           <Link to="/AvailabledatesList">Availability</Link>
           <Link to="/AppointmentList">Appointment List</Link>
           <Link to="/Feedbacks">Feedbacks</Link>
-          <Link to="/Actions">Actions</Link>
           <button className="logout-btn">Logout</button>
         </div>
       </div>
@@ -113,7 +144,7 @@ const AvailabledatesList = () => {
           className="add-availability-btn animated-button"
           onClick={handleAddAvailabilityClick}
         >
-          {showForm ? 'Close Form' : 'Add Availability'}
+          {showForm ? "Close Form" : "Add Availability"}
         </button>
 
         <table className="availabledates-table">
@@ -123,15 +154,20 @@ const AvailabledatesList = () => {
               <th>Doctor ID</th>
               <th>From Date</th>
               <th>End Date</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {availableDates.map((date, index) => (
+            {availableDates.map((date) => (
               <tr key={date.availabilityId}>
                 <td>{date.availabilityId}</td>
                 <td>{date.doctorId}</td>
                 <td>{date.fromDate}</td>
                 <td>{date.endDate}</td>
+                <td>
+                  <button onClick={() => handleEdit(date.availabilityId)}>Edit</button>
+                  <button onClick={() => handleDelete(date.availabilityId)}>Delete</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -140,7 +176,7 @@ const AvailabledatesList = () => {
 
       {showForm && (
         <div className="add-availability-form animated-form">
-          <h2>Add Availability</h2>
+          <h2>{editingId ? "Edit Availability" : "Add Availability"}</h2>
           <form onSubmit={handleSubmit}>
             <label>Doctor ID</label>
             <input
@@ -173,7 +209,7 @@ const AvailabledatesList = () => {
             {errors.endDate && <p className="error-message">{errors.endDate}</p>}
 
             <button type="submit" className="submit-btn">
-              Submit
+              {editingId ? "Update" : "Submit"}
             </button>
           </form>
         </div>

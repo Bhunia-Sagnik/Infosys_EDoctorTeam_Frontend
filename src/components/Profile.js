@@ -103,7 +103,6 @@ const Profile = () => {
           <Link to="/AvailabledatesList">Availability</Link>
           <Link to="/AppointmentList">Appointment List</Link>
           <Link to="/Feedbacks">Feedbacks</Link>
-          <Link to="/Actions">Actions</Link>
           <button className="logout-btn">Logout</button>
         </div>
       </div>
