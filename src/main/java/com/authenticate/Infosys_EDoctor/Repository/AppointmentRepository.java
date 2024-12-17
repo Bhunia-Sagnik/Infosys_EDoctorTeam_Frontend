@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-    List<Appointment> findByDoctor_DoctorIdAndAppointmentDateTimeBetween(String doctorId, LocalDateTime start, LocalDateTime end);
+    List<Appointment> findByAppointmentDateTimeBetween(LocalDateTime start, LocalDateTime end);
     List<Appointment> findByPatient_PatientId(String patientId);
     List<Appointment> findByDoctor_DoctorId(String doctorId);
 }

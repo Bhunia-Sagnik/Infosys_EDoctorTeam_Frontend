@@ -2,6 +2,7 @@ package com.authenticate.Infosys_EDoctor.Service;
 
 import com.authenticate.Infosys_EDoctor.Entity.Appointment;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface AppointmentService {
@@ -16,4 +17,6 @@ public interface AppointmentService {
     void cancelAppointment(Long appointmentId, String reason);
 
     Appointment confirmAppointment(Long appointmentId);
+
+    List<Appointment> getAppointmentsByDate(LocalDate nextDay);
 }

@@ -4,6 +4,7 @@ import com.authenticate.Infosys_EDoctor.Entity.Appointment;
 import com.authenticate.Infosys_EDoctor.Entity.Doctor;
 import com.authenticate.Infosys_EDoctor.Entity.DoctorAvailability;
 import com.authenticate.Infosys_EDoctor.Service.DoctorService;
+import com.authenticate.Infosys_EDoctor.Service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +20,15 @@ public class DoctorController {
     @Autowired
     private DoctorService doctorService;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @PostMapping("/addProfile")
     public ResponseEntity<Doctor> addDoctor(@RequestBody Doctor doctor) {
         Doctor newDoctor = doctorService.addDoctor(doctor);
+
+        notificationService.sendDoctorProfileCreatedNotification(newDoctor.getEmail(), newDoctor.getDoctorId());
+
         return ResponseEntity.ok(newDoctor);
     }
 
@@ -65,12 +72,17 @@ public class DoctorController {
     public ResponseEntity<Appointment> confirmAppointment(@PathVariable Long appointmentId) {
         Appointment appointment = doctorService.confirmAppointment(appointmentId);
 
+        notificationService.sendAppointmentConfirmationToPatient(appointment);
+
         return ResponseEntity.ok(appointment);
     }
 
     @PutMapping("/cancel-appointment/{appointmentId}")
-    public ResponseEntity<String> cancelAppointment(@PathVariable Long appointmentId, @RequestBody String reason) {
+    public ResponseEntity<String> cancelAppointment(@PathVariable Long appointmentId, @RequestParam String reason) {
         doctorService.cancelAppointment(appointmentId, reason);
+
+        notificationService.sendAppointmentCancellationNotification(appointmentId, reason, true);
+
         return ResponseEntity.ok("Appointment cancelled successfully");
     }
 }

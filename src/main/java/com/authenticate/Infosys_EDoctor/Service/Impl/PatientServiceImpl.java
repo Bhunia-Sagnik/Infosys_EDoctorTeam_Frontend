@@ -53,8 +53,6 @@ public class PatientServiceImpl implements PatientService {
         patient.setPassword(passwordEncoder.encode(patient.getPassword()));
         Patient savedPatient = patientRepository.save(patient);
 
-        emailService.sendPatientIdEmail(savedPatient.getEmail(), savedPatient.getPatientId());
-
         return savedPatient;
     }
 

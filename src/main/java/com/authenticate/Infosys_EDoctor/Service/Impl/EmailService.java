@@ -20,20 +20,4 @@ public class EmailService {
         message.setText(content);
         mailSender.send(message);
     }
-
-    public void sendDoctorIdEmail(String email, String doctorId) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("Doctor Profile Created");
-        message.setText("Your Doctor ID is: " + doctorId + "\nSave this ID for further references");
-        mailSender.send(message);
-    }
-
-    public void sendPatientIdEmail(String email, String patientId) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("Patient Profile Created");
-        message.setText("Your Patient ID is: " + patientId + "\nSave this ID for further references");
-        mailSender.send(message);
-    }
 }

@@ -4,6 +4,9 @@ import com.authenticate.Infosys_EDoctor.Entity.Appointment;
 import com.authenticate.Infosys_EDoctor.Entity.Doctor;
 import com.authenticate.Infosys_EDoctor.Entity.DoctorAvailability;
 import com.authenticate.Infosys_EDoctor.Entity.Patient;
+import com.authenticate.Infosys_EDoctor.Service.AppointmentService;
+import com.authenticate.Infosys_EDoctor.Service.DoctorService;
+import com.authenticate.Infosys_EDoctor.Service.NotificationService;
 import com.authenticate.Infosys_EDoctor.Service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +21,17 @@ public class PatientController {
     @Autowired
     private PatientService patientService;
 
+    @Autowired
+    NotificationService notificationService;
+
     // 1. Add Profile
     @PostMapping("/addProfile")
     public ResponseEntity<Patient> addProfile(@RequestBody Patient patient) {
-        return ResponseEntity.ok(patientService.addPatient(patient));
+        Patient savedPatient = patientService.addPatient(patient);
+
+        notificationService.sendPatientProfileCreatedNotification(savedPatient.getEmail(), savedPatient.getPatientId());
+
+        return ResponseEntity.ok(savedPatient);
     }
 
     // 2. Update Profile
@@ -58,7 +68,11 @@ public class PatientController {
     // 4. Make Appointment
     @PostMapping("/makeAppointment")
     public ResponseEntity<Appointment> makeAppointment(@RequestBody Appointment appointment) {
-        return ResponseEntity.ok(patientService.makeAppointment(appointment));
+        Appointment scheduled = patientService.makeAppointment(appointment);
+
+        notificationService.sendNewAppointmentNotificationToDoctor(scheduled);
+
+        return ResponseEntity.ok(scheduled);
     }
 
     // 5. Update Appointment
@@ -69,8 +83,11 @@ public class PatientController {
 
     // 6. Cancel Appointment
     @PutMapping("/cancelAppointment/{appointmentId}")
-    public ResponseEntity<String> cancelAppointment(@PathVariable Long appointmentId, @RequestBody String reason) {
+    public ResponseEntity<String> cancelAppointment(@PathVariable Long appointmentId, @RequestParam String reason) {
         patientService.cancelAppointment(appointmentId, reason);
+
+        notificationService.sendAppointmentCancellationNotification(appointmentId, reason, false);
+
         return ResponseEntity.ok("Appointment canceled successfully");
     }
 }

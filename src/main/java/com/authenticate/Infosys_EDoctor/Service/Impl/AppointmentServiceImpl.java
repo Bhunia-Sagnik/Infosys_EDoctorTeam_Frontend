@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -98,5 +99,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setStatus(Appointment.Status.Confirmed);
 
         return appointmentRepository.save(appointment);
+    }
+
+    @Override
+    public List<Appointment> getAppointmentsByDate(LocalDate date) {
+        return appointmentRepository.findByAppointmentDateTimeBetween(
+                date.atStartOfDay(),
+                date.atTime(23, 59, 59)
+        );
     }
 }
