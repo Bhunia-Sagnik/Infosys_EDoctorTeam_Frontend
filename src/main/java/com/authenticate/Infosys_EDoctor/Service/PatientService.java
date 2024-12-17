@@ -16,4 +16,6 @@ public interface PatientService {
     public Appointment makeAppointment(Appointment appointment);
     public List<Doctor> findDoctorsBySpecialization(String specialization);
     public List<DoctorAvailability> getAvailableDates(String doctorId);
+
+    public Patient getPatientById(String patientId);
 }

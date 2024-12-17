@@ -30,6 +30,12 @@ public class PatientController {
         return ResponseEntity.ok(patientService.updateProfile(patientId, updatedPatient));
     }
 
+    // 3. View Patient Details
+    @GetMapping("/viewProfile")
+    public ResponseEntity<Patient> viewPatientDetails(@RequestParam String patientId) {
+        return ResponseEntity.ok(patientService.getPatientById(patientId));
+    }
+
     // 3. Find Doctors
     @GetMapping("/findDoctors")
     public ResponseEntity<List<Doctor>> findDoctors() {

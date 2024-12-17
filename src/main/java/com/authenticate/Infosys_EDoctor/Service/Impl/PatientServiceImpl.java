@@ -107,5 +107,13 @@ public class PatientServiceImpl implements PatientService {
     public List<DoctorAvailability> getAvailableDates(String doctorId) {
         return doctorAvailabilityService.getAvailabilityByDoctorId(doctorId); // Assuming Doctor entity has a list of available dates
     }
+
+    @Override
+    public Patient getPatientById(String patientId) {
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new RuntimeException("Patient with " + patientId + " not found"));
+
+        return patient;
+    }
 }
 
