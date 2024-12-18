@@ -4,8 +4,11 @@ import com.authenticate.Infosys_EDoctor.Entity.Appointment;
 import com.authenticate.Infosys_EDoctor.Entity.Doctor;
 import com.authenticate.Infosys_EDoctor.Entity.DoctorAvailability;
 import com.authenticate.Infosys_EDoctor.Entity.Patient;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PatientService {
     public Patient addPatient(Patient patient);
@@ -18,4 +21,10 @@ public interface PatientService {
     public List<DoctorAvailability> getAvailableDates(String doctorId);
 
     public Patient getPatientById(String patientId);
+
+    public Patient getPatientByUserId(Long userId);
+
+    List<Appointment> viewAppointments(String patientId);
+
+    Optional<Patient> getPatientByEmail(String email);
 }

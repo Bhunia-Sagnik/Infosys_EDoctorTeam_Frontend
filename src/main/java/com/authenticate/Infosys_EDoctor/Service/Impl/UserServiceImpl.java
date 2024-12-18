@@ -103,6 +103,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserById(Long userId) {
+        return userRepository.getReferenceById(userId);
+    }
+
+    @Override
     public boolean resetPassword(String email, String token, String newPassword) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         User user = userOpt.get();

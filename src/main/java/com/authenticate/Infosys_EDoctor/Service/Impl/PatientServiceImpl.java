@@ -7,10 +7,8 @@ import com.authenticate.Infosys_EDoctor.Entity.Patient;
 import com.authenticate.Infosys_EDoctor.Repository.DoctorAvailabilityRepository;
 import com.authenticate.Infosys_EDoctor.Repository.DoctorRepository;
 import com.authenticate.Infosys_EDoctor.Repository.PatientRepository;
-import com.authenticate.Infosys_EDoctor.Service.AppointmentService;
-import com.authenticate.Infosys_EDoctor.Service.DoctorAvailabilityService;
-import com.authenticate.Infosys_EDoctor.Service.DoctorService;
-import com.authenticate.Infosys_EDoctor.Service.PatientService;
+import com.authenticate.Infosys_EDoctor.Repository.UserRepository;
+import com.authenticate.Infosys_EDoctor.Service.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +20,9 @@ import java.util.UUID;
 
 @Service
 public class PatientServiceImpl implements PatientService {
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     private PatientRepository patientRepository;
@@ -38,9 +39,6 @@ public class PatientServiceImpl implements PatientService {
     @Autowired
     AppointmentService appointmentService;
 
-    @Autowired
-    private EmailService emailService;
-
     // 1. Add Profile
     public Patient addPatient(Patient patient) {
         Optional<Patient> exists = patientRepository.findByEmail(patient.getEmail());
@@ -50,7 +48,6 @@ public class PatientServiceImpl implements PatientService {
 
         String id = "PAT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         patient.setPatientId(id);
-        patient.setPassword(passwordEncoder.encode(patient.getPassword()));
         Patient savedPatient = patientRepository.save(patient);
 
         return savedPatient;
@@ -112,6 +109,26 @@ public class PatientServiceImpl implements PatientService {
                 .orElseThrow(() -> new RuntimeException("Patient with " + patientId + " not found"));
 
         return patient;
+    }
+
+    @Override
+    public Patient getPatientByUserId(Long userId) {
+        Optional<Patient> patient = patientRepository.findByEmail(userService.getUserById(userId).getEmail());
+        if(patient.isEmpty()) {
+            throw new RuntimeException("Patient doest not exist");
+        }
+
+        return patient.get();
+    }
+
+    @Override
+    public List<Appointment> viewAppointments(String patientId) {
+        return appointmentService.getAppointmentsForPatient(patientId);
+    }
+
+    @Override
+    public Optional<Patient> getPatientByEmail(String email) {
+        return patientRepository.findByEmail(email);
     }
 }
 

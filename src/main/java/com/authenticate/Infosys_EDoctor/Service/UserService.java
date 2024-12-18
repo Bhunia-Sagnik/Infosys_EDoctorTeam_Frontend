@@ -10,4 +10,6 @@ public interface UserService extends UserDetailsService {
     public boolean verifyEmail(String token, String username);
     public boolean resetPassword(String email, String token, String newPassword);
     public boolean sendResetPasswordToken(String email);
+
+    User getUserById(Long userId);
 }

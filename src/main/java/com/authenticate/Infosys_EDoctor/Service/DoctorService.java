@@ -3,6 +3,8 @@ package com.authenticate.Infosys_EDoctor.Service;
 import com.authenticate.Infosys_EDoctor.Entity.Appointment;
 import com.authenticate.Infosys_EDoctor.Entity.Doctor;
 import com.authenticate.Infosys_EDoctor.Entity.DoctorAvailability;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -22,5 +24,7 @@ public interface DoctorService {
     Appointment confirmAppointment(Long appointmentId);
 
     void cancelAppointment(Long appontmentId, String reason);
+
+    Doctor getDoctorByEmail(String email);
 }
 

@@ -1,22 +1,21 @@
 package com.authenticate.Infosys_EDoctor.Controller;
 
-import com.authenticate.Infosys_EDoctor.Entity.Appointment;
-import com.authenticate.Infosys_EDoctor.Entity.Doctor;
-import com.authenticate.Infosys_EDoctor.Entity.DoctorAvailability;
-import com.authenticate.Infosys_EDoctor.Entity.Patient;
-import com.authenticate.Infosys_EDoctor.Service.AppointmentService;
-import com.authenticate.Infosys_EDoctor.Service.DoctorService;
-import com.authenticate.Infosys_EDoctor.Service.NotificationService;
-import com.authenticate.Infosys_EDoctor.Service.PatientService;
+import com.authenticate.Infosys_EDoctor.Entity.*;
+import com.authenticate.Infosys_EDoctor.Service.*;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/patient")
 public class PatientController {
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private PatientService patientService;
@@ -26,7 +25,22 @@ public class PatientController {
 
     // 1. Add Profile
     @PostMapping("/addProfile")
-    public ResponseEntity<Patient> addProfile(@RequestBody Patient patient) {
+    public ResponseEntity<?> addProfile(@RequestBody Patient patient, HttpSession session) {
+        // Check if the doctor is logged in
+        if (session.getAttribute("userId") == null) {
+            return ResponseEntity.status(403).body("You must be logged in.");
+        }
+
+        // Check if profile already exists
+        User user = userService.getUserById((long)session.getAttribute("userId"));
+        Optional<Patient> existingPatient = patientService.getPatientByEmail(user.getEmail());
+        if (existingPatient.isPresent()) {
+            return ResponseEntity.badRequest().body("You already have a profile, you can update it.");
+        }
+
+        // Create profile
+        patient.setPassword(user.getPassword());
+        patient.setEmail(user.getEmail());
         Patient savedPatient = patientService.addPatient(patient);
 
         notificationService.sendPatientProfileCreatedNotification(savedPatient.getEmail(), savedPatient.getPatientId());
@@ -36,14 +50,44 @@ public class PatientController {
 
     // 2. Update Profile
     @PutMapping("/updateProfile")
-    public ResponseEntity<Patient> updateProfile(@RequestParam String patientId, @RequestBody Patient updatedPatient) {
-        return ResponseEntity.ok(patientService.updateProfile(patientId, updatedPatient));
+    public ResponseEntity<?> updateProfile(@RequestBody Patient patient, HttpSession session) {
+        // Check if the doctor is logged in
+        if (session.getAttribute("userId") == null) {
+            return ResponseEntity.status(403).body("You must be logged in.");
+        }
+
+        // Check if profile already exists
+        User user = userService.getUserById((long)session.getAttribute("userId"));
+        Optional<Patient> existingPatient = patientService.getPatientByEmail(user.getEmail());
+        if (existingPatient.isEmpty()) {
+            return ResponseEntity.badRequest().body("You don't have a profile. Create one first.");
+        }
+
+        Patient oldPatient = existingPatient.get();
+
+        // Update profile
+        Patient updatedPatient = patientService.updateProfile(oldPatient.getPatientId(), patient);
+        return ResponseEntity.ok(updatedPatient);
     }
 
     // 3. View Patient Details
     @GetMapping("/viewProfile")
-    public ResponseEntity<Patient> viewPatientDetails(@RequestParam String patientId) {
-        return ResponseEntity.ok(patientService.getPatientById(patientId));
+    public ResponseEntity<?> viewPatientDetails(HttpSession session) {
+        // Check if the doctor is logged in
+        if (session.getAttribute("userId") == null) {
+            return ResponseEntity.status(403).body("You must be logged in.");
+        }
+
+        // Check if profile already exists
+        User user = userService.getUserById((long)session.getAttribute("userId"));
+        Optional<Patient> existingPatient = patientService.getPatientByEmail(user.getEmail());
+        if (existingPatient.isEmpty()) {
+            return ResponseEntity.badRequest().body("You don't have a profile. Create one first.");
+        }
+
+        Patient oldPatient = existingPatient.get();
+
+        return ResponseEntity.ok(patientService.getPatientById(oldPatient.getPatientId()));
     }
 
     // 3. Find Doctors
@@ -67,12 +111,43 @@ public class PatientController {
 
     // 4. Make Appointment
     @PostMapping("/makeAppointment")
-    public ResponseEntity<Appointment> makeAppointment(@RequestBody Appointment appointment) {
+    public ResponseEntity<?> makeAppointment(@RequestBody Appointment appointment, HttpSession session) {
+        // Check if the doctor is logged in
+        if (session.getAttribute("userId") == null) {
+            return ResponseEntity.status(403).body("You must be logged in.");
+        }
+
+        // Check if profile already exists
+        User user = userService.getUserById((long)session.getAttribute("userId"));
+        Optional<Patient> existingPatient = patientService.getPatientByEmail(user.getEmail());
+        if (existingPatient.isEmpty()) {
+            return ResponseEntity.badRequest().body("You don't have a profile. Create one first.");
+        }
+
         Appointment scheduled = patientService.makeAppointment(appointment);
 
         notificationService.sendNewAppointmentNotificationToDoctor(scheduled);
 
         return ResponseEntity.ok(scheduled);
+    }
+
+    @GetMapping("/viewAppointments")
+    public ResponseEntity<?> viewAppointments(HttpSession session) {
+        // Check if the doctor is logged in
+        if (session.getAttribute("userId") == null) {
+            return ResponseEntity.status(403).body("You must be logged in.");
+        }
+
+        // Check if profile already exists
+        User user = userService.getUserById((long)session.getAttribute("userId"));
+        Optional<Patient> existingPatient = patientService.getPatientByEmail(user.getEmail());
+        if (existingPatient.isEmpty()) {
+            return ResponseEntity.badRequest().body("You don't have a profile. Create one first.");
+        }
+
+        Patient oldPatient = existingPatient.get();
+
+        return ResponseEntity.ok(patientService.viewAppointments(oldPatient.getPatientId()));
     }
 
     // 5. Update Appointment

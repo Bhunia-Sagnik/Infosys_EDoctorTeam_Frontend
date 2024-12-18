@@ -4,27 +4,26 @@ import com.authenticate.Infosys_EDoctor.Entity.Appointment;
 import com.authenticate.Infosys_EDoctor.Entity.Doctor;
 import com.authenticate.Infosys_EDoctor.Entity.DoctorAvailability;
 import com.authenticate.Infosys_EDoctor.Repository.DoctorRepository;
-import com.authenticate.Infosys_EDoctor.Service.AppointmentService;
-import com.authenticate.Infosys_EDoctor.Service.DoctorAvailabilityService;
-import com.authenticate.Infosys_EDoctor.Service.DoctorService;
+import com.authenticate.Infosys_EDoctor.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class DoctorServiceImpl implements DoctorService {
 
     @Autowired
+    UserService userService;
+
+    @Autowired
     private DoctorRepository doctorRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private EmailService emailService;
 
     @Autowired
     private DoctorAvailabilityService doctorAvailabilityService;
@@ -34,12 +33,16 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     public Doctor addDoctor(Doctor doctor) {
-        // Validate and save doctor
+        Doctor exists = doctorRepository.findByEmail(doctor.getEmail());
+        if(exists != null) {
+            throw new RuntimeException("Doctor profile already exists");
+        }
+
         String id = "DOC-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         doctor.setDoctorId(id);
-        doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
-
         Doctor savedDoc = doctorRepository.save(doctor);
+
+        //notificationService.sendDoctorProfileCreatedNotification(savedDoc.getEmail(), savedDoc.getDoctorId());
 
         return savedDoc;
     }
@@ -103,6 +106,11 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public void cancelAppointment(Long appontmentId, String reason) {
         appointmentService.cancelAppointment(appontmentId, reason);
+    }
+
+    @Override
+    public Doctor getDoctorByEmail(String email) {
+        return doctorRepository.findByEmail(email);
     }
 }
 

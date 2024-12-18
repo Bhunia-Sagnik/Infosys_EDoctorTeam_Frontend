@@ -2,6 +2,7 @@ package com.authenticate.Infosys_EDoctor.Controller;
 
 import com.authenticate.Infosys_EDoctor.Entity.User;
 import com.authenticate.Infosys_EDoctor.Service.UserService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +24,23 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@Valid @RequestBody Map<String, String> loginDetails) {
+    public ResponseEntity<User> loginUser(@Valid @RequestBody Map<String, String> loginDetails, HttpSession session) {
         String username = loginDetails.get("username");
         String password = loginDetails.get("password");
 
         User user = userService.loginUser(username, password);
+        if (user != null) {
+            session.setAttribute("userId", user.getId()); // Store user ID in session
+            session.setAttribute("role", user.getRole()); // Example: Admin/Patient/Doctor
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.status(401).body(null); // Unauthorized
+    }
 
-        return ResponseEntity.ok(user);
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpSession session) {
+        session.invalidate(); // Invalidate session
+        return ResponseEntity.ok("Logged out successfully");
     }
 
     @PostMapping("/verify-email")
