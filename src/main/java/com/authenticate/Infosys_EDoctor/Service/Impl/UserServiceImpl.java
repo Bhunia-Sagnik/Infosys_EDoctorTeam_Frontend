@@ -108,6 +108,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User does not exist"));
+
+        return user;
+    }
+
+    @Override
     public boolean resetPassword(String email, String token, String newPassword) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         User user = userOpt.get();

@@ -1,9 +1,6 @@
 package com.authenticate.Infosys_EDoctor.Service.Impl;
 
-import com.authenticate.Infosys_EDoctor.Entity.Appointment;
-import com.authenticate.Infosys_EDoctor.Entity.Doctor;
-import com.authenticate.Infosys_EDoctor.Entity.DoctorAvailability;
-import com.authenticate.Infosys_EDoctor.Entity.Patient;
+import com.authenticate.Infosys_EDoctor.Entity.*;
 import com.authenticate.Infosys_EDoctor.Repository.DoctorAvailabilityRepository;
 import com.authenticate.Infosys_EDoctor.Repository.DoctorRepository;
 import com.authenticate.Infosys_EDoctor.Repository.PatientRepository;
@@ -14,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -83,8 +81,19 @@ public class PatientServiceImpl implements PatientService {
     }
 
     // 5. Update Appointment
-    public Appointment updateAppointment(Long appointmentId, Appointment updatedAppointment) {
-        return appointmentService.updateAppointment(appointmentId, updatedAppointment);
+    public Appointment updateAppointment(Long appointmentId, AppointmentRequest updatedAppointment) {
+        Appointment existingAppointment = appointmentService.getAppointmentById(appointmentId);
+
+        Appointment appointment = new Appointment();
+
+        appointment.setAppointmentId(existingAppointment.getAppointmentId());
+        appointment.setPatient(existingAppointment.getPatient());
+        appointment.setDoctor(existingAppointment.getDoctor());
+        appointment.setStatus(existingAppointment.getStatus());
+        appointment.setReason(updatedAppointment.getReason());
+        appointment.setAppointmentDateTime(LocalDateTime.parse(updatedAppointment.getAppointmentDateTime()));
+
+        return appointmentService.updateAppointment(appointmentId, appointment);
     }
 
     // 6. Cancel Appointment
@@ -129,6 +138,16 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public Optional<Patient> getPatientByEmail(String email) {
         return patientRepository.findByEmail(email);
+    }
+
+    @Override
+    public List<Doctor> findDoctorsByName(String doctorName) {
+        return doctorService.getDoctorsByName(doctorName);
+    }
+
+    @Override
+    public Doctor getDoctorById(String doctorId) {
+        return doctorService.getDoctorById(doctorId);
     }
 }
 

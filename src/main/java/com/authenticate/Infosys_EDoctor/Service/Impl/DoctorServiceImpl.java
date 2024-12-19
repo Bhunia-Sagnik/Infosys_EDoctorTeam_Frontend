@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -85,7 +86,15 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     public List<Doctor> findDoctorsBySpecialization(String specialization) {
-        return doctorRepository.findBySpecialization(specialization);
+        List<Doctor> doctors = doctorRepository.findAll();
+        List<Doctor> fetched = new ArrayList<>();
+
+        for(Doctor doctor: doctors) {
+            if(doctor.getSpecialization().equalsIgnoreCase(specialization)) {
+                fetched.add(doctor);
+            }
+        }
+        return fetched;
     }
 
     @Override
@@ -104,13 +113,33 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public void cancelAppointment(Long appontmentId, String reason) {
-        appointmentService.cancelAppointment(appontmentId, reason);
+    public void cancelAppointment(Long appointmentId, String reason) {
+        appointmentService.cancelAppointment(appointmentId, reason);
     }
 
     @Override
     public Doctor getDoctorByEmail(String email) {
         return doctorRepository.findByEmail(email);
+    }
+
+    @Override
+    public List<Doctor> getDoctorsByName(String doctorName) {
+        if (doctorName == null || doctorName.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Fetch all doctors
+        List<Doctor> doctors = doctorRepository.findAll();
+        List<Doctor> fetched = new ArrayList<>();
+
+        // Loop through all doctors and check for case-insensitive matching
+        for (Doctor doctor : doctors) {
+            if (doctor.getName().toLowerCase().contains(doctorName.trim().toLowerCase())) {
+                fetched.add(doctor);
+            }
+        }
+
+        return fetched;
     }
 }
 

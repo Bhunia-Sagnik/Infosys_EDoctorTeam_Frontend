@@ -29,17 +29,17 @@ public class DoctorController {
     @Autowired
     private NotificationService notificationService;
 
-    @PostMapping("/addProfile")
-    public ResponseEntity<?> addDoctor(@RequestBody Doctor doctor, HttpSession session) {
+    @PostMapping("/{username}/addProfile")
+    public ResponseEntity<?> addDoctor(@RequestBody Doctor doctor, @PathVariable String username) {
         // Check if the doctor is logged in
-        if (session.getAttribute("userId") == null) {
+        if (username == null) {
             return ResponseEntity.status(403).body("You must be logged in to add a profile.");
         }
 
         // Check if profile already exists
-        User user = userService.getUserById((long)session.getAttribute("userId"));
+        User user = userService.getUserByUsername(username);
         Doctor existingDoctor = doctorService.getDoctorByEmail(user.getEmail());
-        if (existingDoctor == null) {
+        if (existingDoctor != null) {
             return ResponseEntity.badRequest().body("You already have a profile, you can update it.");
         }
 
@@ -53,33 +53,33 @@ public class DoctorController {
         return ResponseEntity.ok(newDoctor);
     }
 
-    @GetMapping("/viewProfile")
-    public ResponseEntity<?> getDoctorById(HttpSession session) {
+    @GetMapping("/{username}/viewProfile")
+    public ResponseEntity<?> getDoctorById(@PathVariable String username) {
         // Check if the doctor is logged in
-        if (session.getAttribute("userId") == null) {
+        if (username == null) {
             return ResponseEntity.status(403).body("You must be logged in to add a profile.");
         }
 
         // Check if profile already exists
-        User user = userService.getUserById((long)session.getAttribute("userId"));
+        User user = userService.getUserByUsername(username);
         Doctor existingDoctor = doctorService.getDoctorByEmail(user.getEmail());
         if (existingDoctor == null) {
-            return ResponseEntity.badRequest().body("You already have a profile, you can update it.");
+            return ResponseEntity.badRequest().body("You don't have a profile. Make one first.");
         }
 
         Doctor doctor = doctorService.getDoctorById(existingDoctor.getDoctorId());
         return ResponseEntity.ok(doctor);
     }
 
-    @PutMapping("/updateProfile")
-    public ResponseEntity<?> updateDoctor(@RequestBody Doctor doctor, HttpSession session) {
+    @PutMapping("/{username}/updateProfile")
+    public ResponseEntity<?> updateDoctor(@RequestBody Doctor doctor, @PathVariable String username) {
         // Check if the doctor is logged in
-        if (session.getAttribute("userId") == null) {
+        if (username == null) {
             return ResponseEntity.status(403).body("You must be logged in to add a profile.");
         }
 
         // Check if profile already exists
-        User user = userService.getUserById((long)session.getAttribute("userId"));
+        User user = userService.getUserByUsername(username);
         Doctor existingDoctor = doctorService.getDoctorByEmail(user.getEmail());
         if (existingDoctor == null) {
             return ResponseEntity.badRequest().body("You already have a profile, you can update it.");
@@ -96,15 +96,15 @@ public class DoctorController {
         return ResponseEntity.ok("Doctor " + doctorId + " deleted successfully.");
     }
 
-    @GetMapping("/available-slots")
-    public ResponseEntity<?> getAvailableSlots(HttpSession session) {
+    @GetMapping("/{username}/available-slots")
+    public ResponseEntity<?> getAvailableSlots(@PathVariable String username) {
         // Check if the doctor is logged in
-        if (session.getAttribute("userId") == null) {
+        if (username == null) {
             return ResponseEntity.status(403).body("You must be logged in to add a profile.");
         }
 
         // Check if profile already exists
-        User user = userService.getUserById((long)session.getAttribute("userId"));
+        User user = userService.getUserByUsername(username);
         Doctor existingDoctor = doctorService.getDoctorByEmail(user.getEmail());
         if (existingDoctor == null) {
             return ResponseEntity.badRequest().body("You already have a profile, you can update it.");
@@ -120,15 +120,15 @@ public class DoctorController {
         return ResponseEntity.ok(doctors);
     }
 
-    @GetMapping("/viewAppointments")
-    public ResponseEntity<?> getAllAppointments(HttpSession session) {
+    @GetMapping("/{username}/viewAppointments")
+    public ResponseEntity<?> getAllAppointments(@PathVariable String username) {
         // Check if the doctor is logged in
-        if (session.getAttribute("userId") == null) {
+        if (username == null) {
             return ResponseEntity.status(403).body("You must be logged in to add a profile.");
         }
 
         // Check if profile already exists
-        User user = userService.getUserById((long)session.getAttribute("userId"));
+        User user = userService.getUserByUsername(username);
         Doctor existingDoctor = doctorService.getDoctorByEmail(user.getEmail());
         if (existingDoctor == null) {
             return ResponseEntity.badRequest().body("You already have a profile, you can update it.");

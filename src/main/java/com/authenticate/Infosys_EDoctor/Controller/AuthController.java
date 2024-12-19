@@ -24,22 +24,20 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@Valid @RequestBody Map<String, String> loginDetails, HttpSession session) {
+    public ResponseEntity<User> loginUser(@Valid @RequestBody Map<String, String> loginDetails) {
         String username = loginDetails.get("username");
         String password = loginDetails.get("password");
 
         User user = userService.loginUser(username, password);
         if (user != null) {
-            session.setAttribute("userId", user.getId()); // Store user ID in session
-            session.setAttribute("role", user.getRole()); // Example: Admin/Patient/Doctor
             return ResponseEntity.ok(user);
         }
+
         return ResponseEntity.status(401).body(null); // Unauthorized
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpSession session) {
-        session.invalidate(); // Invalidate session
+    public ResponseEntity<String> logout() {
         return ResponseEntity.ok("Logged out successfully");
     }
 

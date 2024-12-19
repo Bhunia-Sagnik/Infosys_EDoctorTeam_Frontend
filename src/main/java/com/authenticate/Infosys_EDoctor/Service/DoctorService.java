@@ -26,5 +26,7 @@ public interface DoctorService {
     void cancelAppointment(Long appontmentId, String reason);
 
     Doctor getDoctorByEmail(String email);
+
+    List<Doctor> getDoctorsByName(String doctorName);
 }
 
