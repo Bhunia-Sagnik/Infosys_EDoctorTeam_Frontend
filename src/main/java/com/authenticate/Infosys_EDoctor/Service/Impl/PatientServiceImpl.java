@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -148,6 +149,20 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public Doctor getDoctorById(String doctorId) {
         return doctorService.getDoctorById(doctorId);
+    }
+
+    @Override
+    public List<Appointment> viewConfirmedAppointments(String patientId) {
+        List<Appointment> appointments = appointmentService.getAppointmentsForPatient(patientId);
+        List<Appointment> confirmedAppointments = new ArrayList<>();
+
+        for(Appointment appointment: appointments) {
+            if(appointment.getStatus() == Appointment.Status.Confirmed) {
+                confirmedAppointments.add(appointment);
+            }
+        }
+
+        return confirmedAppointments;
     }
 }
 

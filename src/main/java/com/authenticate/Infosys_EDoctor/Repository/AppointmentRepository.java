@@ -5,9 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     List<Appointment> findByAppointmentDateTimeBetween(LocalDateTime start, LocalDateTime end);
     List<Appointment> findByPatient_PatientId(String patientId);
     List<Appointment> findByDoctor_DoctorId(String doctorId);
+    Optional<Appointment> findByPaymentId(String paymentId);
 }

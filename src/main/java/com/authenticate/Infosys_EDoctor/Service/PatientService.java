@@ -28,4 +28,6 @@ public interface PatientService {
     List<Doctor> findDoctorsByName(String doctorName);
 
     Doctor getDoctorById(String doctorId);
+
+    List<Appointment> viewConfirmedAppointments(String patientId);
 }

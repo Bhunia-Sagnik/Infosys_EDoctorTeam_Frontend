@@ -173,6 +173,25 @@ public class PatientController {
         return ResponseEntity.ok(patientService.viewAppointments(oldPatient.getPatientId()));
     }
 
+    @GetMapping("/viewConfirmedAppointments")
+    public ResponseEntity<?> viewConfirmedAppointments(@PathVariable String username) {
+        // Check if the doctor is logged in
+        if (username == null) {
+            return ResponseEntity.status(403).body("You must be logged in.");
+        }
+
+        // Check if profile already exists
+        User user = userService.getUserByUsername(username);
+        Optional<Patient> existingPatient = patientService.getPatientByEmail(user.getEmail());
+        if (existingPatient.isEmpty()) {
+            return ResponseEntity.badRequest().body("You dont have a profile. Make one first.");
+        }
+
+        Patient oldPatient = existingPatient.get();
+
+        return ResponseEntity.ok(patientService.viewConfirmedAppointments(oldPatient.getPatientId()));
+    }
+
     // 5. Update Appointment
     @PutMapping("/updateAppointment/{appointmentId}")
     public ResponseEntity<Appointment> updateAppointment(@PathVariable Long appointmentId, @RequestBody AppointmentRequest updatedAppointment) {

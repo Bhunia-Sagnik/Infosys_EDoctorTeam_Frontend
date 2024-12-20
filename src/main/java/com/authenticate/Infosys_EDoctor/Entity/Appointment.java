@@ -34,6 +34,15 @@ public class Appointment {
 
     @Column(length = 10, nullable = false)
     @Enumerated(EnumType.STRING)
-    @NotNull()
+    @NotNull
     private Status status;
+
+    @Column(nullable = false)
+    private boolean paid = false; // Tracks if payment is completed
+
+    private String paymentId; // Stores Razorpay payment ID
+
+    @Lob
+    @Column(name = "invoice_pdf", columnDefinition = "BLOB")
+    private byte[] invoicePdf;
 }
