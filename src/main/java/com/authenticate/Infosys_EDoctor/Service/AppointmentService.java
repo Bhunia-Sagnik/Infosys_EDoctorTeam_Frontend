@@ -19,4 +19,6 @@ public interface AppointmentService {
     Appointment confirmAppointment(Long appointmentId);
 
     List<Appointment> getAppointmentsByDate(LocalDate nextDay);
+
+    List<Appointment> getAllAppointments();
 }

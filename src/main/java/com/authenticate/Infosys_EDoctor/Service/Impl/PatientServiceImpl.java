@@ -70,6 +70,14 @@ public class PatientServiceImpl implements PatientService {
         return patientRepository.save(existingPatient);
     }
 
+    @Override
+    public void deletePatient(String patientId) {
+        Patient existingPatient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new IllegalArgumentException("Patient not found with ID: " + patientId));
+
+        patientRepository.delete(existingPatient);
+    }
+
     // 3. Find Doctors
     public List<Doctor> findDoctors() {
 
@@ -164,5 +172,9 @@ public class PatientServiceImpl implements PatientService {
 
         return confirmedAppointments;
     }
-}
 
+    @Override
+    public List<Patient> getAllPatients() {
+        return patientRepository.findAll();
+    }
+}

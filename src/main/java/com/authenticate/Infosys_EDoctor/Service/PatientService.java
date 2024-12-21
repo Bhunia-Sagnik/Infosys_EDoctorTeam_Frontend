@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface PatientService {
     public Patient addPatient(Patient patient);
     public Patient updateProfile(String patientId, Patient updatedPatient);
+    public void deletePatient(String patientId);
     public List<Doctor> findDoctors();
     public Appointment updateAppointment(Long appointmentId, AppointmentRequest updatedAppointment);
     public void cancelAppointment(Long appointmentId, String reason);
@@ -30,4 +31,6 @@ public interface PatientService {
     Doctor getDoctorById(String doctorId);
 
     List<Appointment> viewConfirmedAppointments(String patientId);
+
+    List<Patient> getAllPatients();
 }

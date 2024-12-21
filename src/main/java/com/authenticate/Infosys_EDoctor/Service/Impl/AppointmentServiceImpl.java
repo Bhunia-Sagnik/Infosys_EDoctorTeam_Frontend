@@ -108,4 +108,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                 date.atTime(23, 59, 59)
         );
     }
+
+    @Override
+    public List<Appointment> getAllAppointments() {
+        return appointmentRepository.findAll();
+    }
 }
